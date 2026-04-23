@@ -6,7 +6,7 @@ from simplearm.jacobians import (
     sphere_jacobians_from_joint_jacobians,
     com_jacobians_from_joint_jacobians,
 )
-from simplearm.geom import pairwise_sphere_dist
+from simplearm.geom import pairwise_sphere_dist, Obstacles, get_min_signed_distance
 from simplearm.dynamics import mass_matrix_from_com_jacobians
 import numpy as np
 
@@ -55,7 +55,23 @@ pairwise_dists, (pair_i, pair_j) = pairwise_sphere_dist(
 print(
     "Pairwise distances are shaped", pairwise_dists.shape
 )  # Of course we only compute pairs (i,j) where i < j, so there are (S-1)*S/2 - len(ignore_pairs) pairs.
+# %%
+# We can also define obstacles in the world and compute distances to them.
 
+obstacles_xy = np.array([[0.5, 0.5], [0.75, 0.25]])
+obstacles_r = np.array([0.1, 0.1])
+obstacles = Obstacles(x=obstacles_xy[:, 0], y=obstacles_xy[:, 1], r=obstacles_r)
+point = np.array([0.6, 0.6])
+signed_dist_to_obstacles = get_min_signed_distance(point, obstacles)
+print("Signed distance from point to obstacles is", signed_dist_to_obstacles)
+# or for the robot spheres:
+spheres_signed_dist_to_obstacles = get_min_signed_distance(
+    np.stack([spheres_world.x, spheres_world.y], axis=-1), obstacles
+)
+print(
+    "Min Signed distance from spheres to obstacles is",
+    spheres_signed_dist_to_obstacles.min(),
+)
 # %%
 # We can use trajectories as well, since the code is fully vectorized for a batch dimension on the configuration, frames, jacobians, and spheres. Since the robot stays the same, we dont vectorize over radii etc.
 q_traj = np.random.uniform(

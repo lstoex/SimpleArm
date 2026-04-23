@@ -68,3 +68,14 @@ def pairwise_sphere_dist(
 
     center_dist = np.linalg.norm(p1 - p2, axis=-1)
     return center_dist - (r1 + r2), (i_idx, j_idx)
+
+
+def get_min_signed_distance(p: np.ndarray, obstacles: Obstacles) -> np.ndarray:
+    """Compute the minimum signed distance from points to a set of circular obstacles.
+
+    Supports arbitrary batch dimensions in `p`, as long as the last dimension is 2.
+    """
+    xy = np.stack([obstacles.x, obstacles.y], axis=-1)  # (M, 2)
+    center_dist = np.linalg.norm(p[..., None, :] - xy, axis=-1)  # (..., M)
+    signed = center_dist - obstacles.r  # (..., M)
+    return np.min(signed, axis=-1)
