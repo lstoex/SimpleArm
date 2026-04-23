@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
 
+
 @dataclass
 class Spheres:
     frame_idx: np.ndarray
@@ -16,6 +17,7 @@ class Spheres:
         else:
             return f"A set of {n_spheres} spheres that live in their respective local link frames."
 
+
 @dataclass
 class SpheresInWorld(Spheres):
     def __repr__(self):
@@ -25,6 +27,18 @@ class SpheresInWorld(Spheres):
             return f"A set of {n_spheres} spheres with batch dimensions {batch_dims} that live in world coordinates."
         else:
             return f"A set of {n_spheres} spheres that live in world coordinates."
+
+
+@dataclass
+class Obstacles:
+    x: np.ndarray
+    y: np.ndarray
+    r: np.ndarray
+
+    def __repr__(self):
+        num_obstacles = len(self.x)
+        return f"A set of {num_obstacles} circular obstacles in the world."
+
 
 def pairwise_sphere_dist(
     spheres: SpheresInWorld, ignore_pairs: set

@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 from simplearm.utils import make_spheres
 
+
 @dataclass
 class Inertias:
     mass: np.ndarray
@@ -13,8 +14,13 @@ class Inertias:
 
     def __post_init__(self):
         """Validate shape and dtype consistency for inertia arrays."""
-        assert self.mass.shape == self.inertia.shape, "Mass and inertia must have the same shape."
-        assert self.mass.dtype == self.inertia.dtype == float, "Mass and inertia must be of float type."
+        assert self.mass.shape == self.inertia.shape, (
+            "Mass and inertia must have the same shape."
+        )
+        assert self.mass.dtype == self.inertia.dtype == float, (
+            "Mass and inertia must be of float type."
+        )
+
 
 @dataclass
 class RobotInfo:
@@ -38,7 +44,14 @@ class RobotInfo:
         return str
 
     @classmethod
-    def from_linklengths(cls, linklengths: ArrayLike, sphere_rad=0.05, sphere_overlap=0.75, mass=1.0, inertia=0.1) -> "RobotInfo":
+    def from_linklengths(
+        cls,
+        linklengths: ArrayLike,
+        sphere_rad=0.05,
+        sphere_overlap=0.75,
+        mass=1.0,
+        inertia=0.1,
+    ) -> "RobotInfo":
         """Construct robot metadata from link lengths and default physical parameters."""
         linklengths = np.asarray(linklengths, dtype=float)
         n_dof = len(linklengths)

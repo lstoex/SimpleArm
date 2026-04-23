@@ -4,13 +4,15 @@ import numpy as np
 import plotly.graph_objects as go
 import functools
 from yaspin import yaspin
+from simplearm.geom import Obstacles
+
 
 class RobotViewer:
     def __init__(
         self,
         q: np.ndarray,
         robot_info: RobotInfo,
-        obstacles: np.ndarray | None = None,
+        obstacles: Obstacles | None = None,
     ):
         self.robot_info = robot_info
         self.dist_img = None
@@ -18,12 +20,8 @@ class RobotViewer:
         self.animate = True if q.ndim > 1 else False
         self.q = np.atleast_2d(q)
 
-        self.frames = forward_kinematic(
-            self.q, self.robot_info.linklengths
-        )
-        self.spheres = world_spheres_from_frames(
-            self.frames, self.robot_info.spheres
-        )
+        self.frames = forward_kinematic(self.q, self.robot_info.linklengths)
+        self.spheres = world_spheres_from_frames(self.frames, self.robot_info.spheres)
         self.current_q_idx = 0
         # register trace and shape getters
         self.trace_getters = [
@@ -79,7 +77,7 @@ class RobotViewer:
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
 
-        wrapper._tracegetter = True # type: ignore
+        wrapper._tracegetter = True  # type: ignore
         return wrapper
 
     @staticmethod
@@ -92,7 +90,7 @@ class RobotViewer:
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
 
-        wrapper._shapegetter = True # type: ignore
+        wrapper._shapegetter = True  # type: ignore
         return wrapper
 
     @staticmethod
@@ -105,7 +103,7 @@ class RobotViewer:
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
 
-        wrapper._bgtracegetter = True # type: ignore
+        wrapper._bgtracegetter = True  # type: ignore
         return wrapper
 
     def plot(self, duration=100):
@@ -352,10 +350,13 @@ class RobotViewer:
             return []
         else:
             traces = []
-            for obs in self.obstacles:
+            for i in range(len(self.obstacles.x)):
+                x = self.obstacles.x[i]
+                y = self.obstacles.y[i]
+                r = self.obstacles.r[i]
                 circle = self.draw_filled_circle(
-                    center=obs[:2],
-                    radius=obs[2],
+                    center=np.array([x, y]),
+                    radius=r,
                     fillcolor="gray",
                     opacity=0.5,
                     name="Obstacle",

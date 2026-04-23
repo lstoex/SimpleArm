@@ -1,5 +1,7 @@
 import numpy as np
 from simplearm.geom import Spheres
+
+
 def __find_bin_and_normalize(
     position: float, linklengths: np.ndarray
 ) -> tuple[int, float]:
@@ -21,6 +23,7 @@ def __find_bin_and_normalize(
     normalized_position = position - bin_start
     return int(bin_index) - 1, normalized_position
 
+
 def make_spheres(
     n_dof: int, linklengths: np.ndarray, sphere_rad: float, overlap: float = 0.75
 ) -> Spheres:
@@ -39,4 +42,3 @@ def make_spheres(
     sphere_y = np.zeros_like(sphere_x)
     spheres_r = np.ones_like(sphere_x) * sphere_rad
     return Spheres(frame_idx=f_idx, x=sphere_x, y=sphere_y, r=spheres_r)
-
