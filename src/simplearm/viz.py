@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import functools
 from yaspin import yaspin
 from simplearm.geom import Obstacles
-
+from simplearm.geom import SquareGrid
 
 class RobotViewer:
     def __init__(
@@ -13,10 +13,13 @@ class RobotViewer:
         q: np.ndarray,
         robot_info: RobotInfo,
         obstacles: Obstacles | None = None,
+        voxels: SquareGrid | None = None,
     ):
         self.robot_info = robot_info
         self.dist_img = None
         self.obstacles = obstacles
+        self.voxels = voxels
+        self.sdf = None if voxels is None else voxels.derive_sdf_from_voxels()
         self.animate = True if q.ndim > 1 else False
         self.q = np.atleast_2d(q)
 
@@ -135,7 +138,7 @@ class RobotViewer:
                                         {
                                             "frame": {
                                                 "duration": duration,
-                                                "redraw": True,
+                                                "redraw": False,
                                             },
                                             "fromcurrent": True,
                                         },
@@ -219,7 +222,9 @@ class RobotViewer:
             # )
             for getter in self.bgtrace_getters:
                 self.fig.add_traces(getter(self))
+            self.draw_voxels()
             self.fig.show()
+
         except Exception as e:
             self.spinner.fail()
             self.spinner.write("Failed to plot robot")
@@ -340,8 +345,11 @@ class RobotViewer:
         circle = np.linspace(0, 2 * np.pi, num=n_points)
         x = center[0] + radius * np.cos(circle)
         y = center[1] + radius * np.sin(circle)
+        #see if kwargs containts a iscolliding key
+        is_colliding = kwargs.pop("iscolliding", False)
+        fillcolor = "red" if is_colliding else kwargs.pop("fillcolor", "green")
         return go.Scatter(
-            x=x, y=y, mode="lines", fill="toself", line=dict(width=0), **kwargs
+            x=x, y=y, mode="lines", fill="toself", line=dict(width=0), fillcolor=fillcolor, **kwargs
         )
 
     @tracegetter
@@ -377,17 +385,60 @@ class RobotViewer:
         spheres_xy = np.stack([self.spheres.x, self.spheres.y], axis=-1)
         sphere_pos = spheres_xy[self.current_q_idx]
         sphere_r = self.robot_info.spheres.r
-        for pos, rad in zip(sphere_pos, sphere_r):
+        if self.voxels is not None and self.sdf is not None:
+            dist_to_world = self.sdf[sphere_pos] - sphere_r
+            is_colliding = dist_to_world < 0
+        else:
+            is_colliding = [False] * len(sphere_pos)
+                
+        for pos, rad, is_c in zip(sphere_pos, sphere_r, is_colliding):
             # we cannot use scatter as it would be resized with the plot. We need to use shapes which have to be passed as dicts
             circle = self.draw_filled_circle(
                 pos,
                 rad,
-                fillcolor="orange",
+                # fillcolor="orange",
                 opacity=0.2,
                 name="Collision Sphere",
                 legendgroup="sphere",
                 showlegend=init_legend,
+                iscolliding=is_c,
             )
             init_legend = False
             spheres.append(circle)
         return spheres
+    
+
+    def draw_voxels(self):
+        from PIL import Image
+        g = self.voxels
+        if g is None:
+            return []
+        grid = g.data.T
+        x0 = -g.length / 2
+        y0 = -g.length / 2
+        dx = g.voxel_size
+        dy = g.voxel_size
+        rows = grid.shape[0]
+        cols = grid.shape[1]
+
+        upscale_factor = 10
+        sharp_grid = np.repeat(np.repeat(grid, upscale_factor, axis=0), upscale_factor, axis=1)
+
+        # 3. Flip and Convert (as established before)
+        flipped_grid = np.flipud(sharp_grid)
+        img = Image.fromarray(255 - (flipped_grid * 255).astype("uint8"))
+        # 2. Add to layout instead of data
+        self.fig.add_layout_image(
+            dict(
+                source=img,
+                xref="x",
+                yref="y",
+                x=x0,  # Your precise center/start
+                y=y0 + (rows * dy),  # PIL images draw from top-down
+                sizex=cols * dx,  # Precise total width
+                sizey=rows * dy,  # Precise total height
+                sizing="stretch",
+                opacity=1.0,
+                layer="below",  # Keeps it behind your animated traces
+            )
+        )
