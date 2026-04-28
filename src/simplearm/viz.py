@@ -69,6 +69,11 @@ class RobotViewer:
 
         # preconfigure spinner
         self.spinner = yaspin(text="Plotting robot...", timer=True)
+        self.fig.update_xaxes(showgrid=False)
+        self.fig.update_yaxes(showgrid=False)
+        #also disable 0-lines
+        self.fig.update_xaxes(zeroline=False)
+        self.fig.update_yaxes(zeroline=False)
 
     @staticmethod
     def tracegetter(func):
