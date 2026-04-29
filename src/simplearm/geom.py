@@ -15,7 +15,7 @@ class SquareGrid:
     origin: SE2  # origin of the edge of the first grid cell in the world frame
 
     def __post_init__(self):
-        assert self.data.ndim == 2, "Grid data must be 2D"
+        # assert self.data.ndim == 2, "Grid data must be 2D"
         assert self.length > 0, "Grid length must be positive"
         assert self.origin is not None, "Grid origin must be provided"
         assert self.data.shape[0] == self.data.shape[1], "Grid data must be square"
@@ -38,6 +38,16 @@ class SquareGrid:
         """Derive a signed distance field from the grid data, treating nonzero values as obstacles."""
         sdf_data = voxel2sdf(voxels=self.data.astype(bool), voxel_size=self.voxel_size)
         return SquareGrid(data=sdf_data, length=self.length, origin=self.origin) 
+
+    def gradient(self) -> tuple["SquareGrid", "SquareGrid"]:
+        """Compute the gradient of the grid data and return it as a 2 new SquareGrids, one for each component of the gradient."""
+        g_x, g_y = np.gradient(self.data, self.voxel_size)
+        g = np.stack([g_x, g_y], axis=-1)  # (nx, ny, 2)
+        #normalize the gradient to have unit length, and set zero gradients to zero to avoid NaNs
+        g_norm = np.linalg.norm(g, axis=-1, keepdims=True)
+        g_norm[g_norm == 0] = 1.0
+        g = g / g_norm
+        return (SquareGrid(data=g[..., 0], length=self.length, origin=self.origin), SquareGrid(data=g[..., 1], length=self.length, origin=self.origin))
 
     @classmethod
     def from_zero_centered(
@@ -128,6 +138,11 @@ class Spheres:
     y: np.ndarray
     r: np.ndarray
 
+    @property
+    def xy(self) -> np.ndarray:
+        """Return the sphere centers as an (S, 2) array."""
+        return np.stack([self.x, self.y], axis=-1)
+
     def __repr__(self):
         batch_dims = self.x.shape[:-1]
         n_spheres = self.x.shape[-1]
@@ -158,6 +173,15 @@ class Obstacles:
         num_obstacles = len(self.x)
         return f"A set of {num_obstacles} circular obstacles in the world."
 
+    def __getitem__(self, p: np.ndarray) -> np.ndarray:
+        """Allow the Obstacles object to be called as a function to compute the signed distance from points to the obstacles."""
+        return get_min_signed_distance(p, self)
+
+    @property
+    def xy(self) -> np.ndarray:
+        """Return the obstacle centers as an (N, 2) array."""
+        return np.stack([self.x, self.y], axis=-1)
+
 
 def pairwise_sphere_dist(
     spheres: SpheresInWorld, ignore_pairs: set
@@ -178,7 +202,7 @@ def pairwise_sphere_dist(
     i_idx = i_idx[mask]
     j_idx = j_idx[mask]
 
-    active_spheres = np.stack([spheres.x, spheres.y], axis=-1)
+    active_spheres = spheres.xy
     active_radii = spheres.r
     p1 = active_spheres[..., i_idx, :]
     p2 = active_spheres[..., j_idx, :]
@@ -194,8 +218,7 @@ def get_min_signed_distance(p: np.ndarray, obstacles: Obstacles) -> np.ndarray:
 
     Supports arbitrary batch dimensions in `p`, as long as the last dimension is 2.
     """
-    xy = np.stack([obstacles.x, obstacles.y], axis=-1)  # (M, 2)
-    center_dist = np.linalg.norm(p[..., None, :] - xy, axis=-1)  # (..., M)
+    center_dist = np.linalg.norm(p[..., None, :] - obstacles.xy, axis=-1)  # (..., M)
     signed = center_dist - obstacles.r  # (..., M)
     return np.min(signed, axis=-1)
 

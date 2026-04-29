@@ -42,7 +42,7 @@ def forward_kinematic(q: np.ndarray, link_lenghts: np.ndarray) -> np.ndarray:
 def world_spheres_from_frames(frames: np.ndarray, spheres: Spheres) -> SpheresInWorld:
     """Transform local-link spheres into world coordinates using frame transforms."""
     frames_ = frames[..., spheres.frame_idx, :, :]
-    xy_spheres = np.stack([spheres.x, spheres.y], axis=1)
+    xy_spheres = spheres.xy
     rotations = frames_[..., :, :2, :2]
     translations = frames_[..., :, :2, 2]
     xy_spheres = np.einsum("...sij,sj->...si", rotations, xy_spheres) + translations

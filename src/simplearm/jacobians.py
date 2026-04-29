@@ -25,7 +25,7 @@ def sphere_jacobians_from_joint_jacobians(
 ) -> np.ndarray:
     """Project joint Jacobians to sphere centers via frame-to-sphere offsets."""
     f_idx = spheres_in_world.frame_idx
-    spheres_xy_global = np.stack([spheres_in_world.x, spheres_in_world.y], axis=-1)
+    spheres_xy_global = spheres_in_world.xy
     bases = frames[..., f_idx, :, :][..., :2, 2]
     offsets = spheres_xy_global - bases
 

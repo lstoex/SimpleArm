@@ -387,7 +387,7 @@ class RobotViewer:
         """
         spheres = []
         init_legend = True
-        spheres_xy = np.stack([self.spheres.x, self.spheres.y], axis=-1)
+        spheres_xy = self.spheres.xy
         sphere_pos = spheres_xy[self.current_q_idx]
         sphere_r = self.robot_info.spheres.r
         if self.voxels is not None and self.sdf is not None:

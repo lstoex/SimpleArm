@@ -66,12 +66,17 @@ signed_dist_to_obstacles = get_min_signed_distance(point, obstacles)
 print("Signed distance from point to obstacles is", signed_dist_to_obstacles)
 # or for the robot spheres:
 spheres_signed_dist_to_obstacles = get_min_signed_distance(
-    np.stack([spheres_world.x, spheres_world.y], axis=-1), obstacles
+    spheres_world.xy, obstacles
 )
 print(
     "Min Signed distance from spheres to obstacles is",
     spheres_signed_dist_to_obstacles.min(),
 )
+#The obstacle class implement the __getitem__ method so we can do the shorthand
+spheres_signed_dist_to_obstacles_shorthand = obstacles[
+    spheres_world.xy
+]
+assert np.allclose(spheres_signed_dist_to_obstacles, spheres_signed_dist_to_obstacles_shorthand)
 # %%
 # We can use trajectories as well, since the code is fully vectorized for a batch dimension on the configuration, frames, jacobians, and spheres. Since the robot stays the same, we dont vectorize over radii etc.
 q_traj = np.random.uniform(
