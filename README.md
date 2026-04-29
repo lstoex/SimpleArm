@@ -10,3 +10,5 @@ uv sync
 ```
 
 Have a look at the examples for usage instructions. Feel free to modify the code and experiment with it. Porting the code to PyTorch or JAX should be straightforward if you want to have it run on a GPU.
+
+Also consider having a look at [chompy](https://github.com/tenhjo/chompy) :)
