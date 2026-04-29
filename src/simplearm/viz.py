@@ -393,6 +393,8 @@ class RobotViewer:
         if self.voxels is not None and self.sdf is not None:
             dist_to_world = self.sdf[sphere_pos] - sphere_r
             is_colliding = dist_to_world < 0
+        elif self.obstacles is not None:
+            is_colliding = self.obstacles[sphere_pos] - sphere_r < 0
         else:
             is_colliding = [False] * len(sphere_pos)
                 
