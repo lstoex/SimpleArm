@@ -182,7 +182,8 @@ class Obstacles:
 
     def __getitem__(self, p: np.ndarray) -> np.ndarray:
         """Allow the Obstacles object to be called as a function to compute the signed distance from points to the obstacles."""
-        return get_min_signed_distance(p, self)
+        p_ = np.atleast_2d(p).reshape(-1, 2)
+        return get_min_signed_distance(p_, self).reshape(p.shape[:-1])
 
     @property
     def xy(self) -> np.ndarray:
