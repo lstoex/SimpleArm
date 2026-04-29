@@ -7,6 +7,7 @@ from yaspin import yaspin
 from simplearm.geom import Obstacles
 from simplearm.geom import SquareGrid
 
+
 class RobotViewer:
     def __init__(
         self,
@@ -71,7 +72,7 @@ class RobotViewer:
         self.spinner = yaspin(text="Plotting robot...", timer=True)
         self.fig.update_xaxes(showgrid=False)
         self.fig.update_yaxes(showgrid=False)
-        #also disable 0-lines
+        # also disable 0-lines
         self.fig.update_xaxes(zeroline=False)
         self.fig.update_yaxes(zeroline=False)
 
@@ -350,11 +351,17 @@ class RobotViewer:
         circle = np.linspace(0, 2 * np.pi, num=n_points)
         x = center[0] + radius * np.cos(circle)
         y = center[1] + radius * np.sin(circle)
-        #see if kwargs containts a iscolliding key
+        # see if kwargs containts a iscolliding key
         is_colliding = kwargs.pop("iscolliding", False)
         fillcolor = "red" if is_colliding else kwargs.pop("fillcolor", "green")
         return go.Scatter(
-            x=x, y=y, mode="lines", fill="toself", line=dict(width=0), fillcolor=fillcolor, **kwargs
+            x=x,
+            y=y,
+            mode="lines",
+            fill="toself",
+            line=dict(width=0),
+            fillcolor=fillcolor,
+            **kwargs,
         )
 
     @tracegetter
@@ -397,7 +404,7 @@ class RobotViewer:
             is_colliding = self.obstacles[sphere_pos] - sphere_r < 0
         else:
             is_colliding = [False] * len(sphere_pos)
-                
+
         for pos, rad, is_c in zip(sphere_pos, sphere_r, is_colliding):
             # we cannot use scatter as it would be resized with the plot. We need to use shapes which have to be passed as dicts
             circle = self.draw_filled_circle(
@@ -413,10 +420,10 @@ class RobotViewer:
             init_legend = False
             spheres.append(circle)
         return spheres
-    
 
     def draw_voxels(self):
         from PIL import Image
+
         g = self.voxels
         if g is None:
             return []
@@ -429,7 +436,9 @@ class RobotViewer:
         cols = grid.shape[1]
 
         upscale_factor = 10
-        sharp_grid = np.repeat(np.repeat(grid, upscale_factor, axis=0), upscale_factor, axis=1)
+        sharp_grid = np.repeat(
+            np.repeat(grid, upscale_factor, axis=0), upscale_factor, axis=1
+        )
 
         # 3. Flip and Convert (as established before)
         flipped_grid = np.flipud(sharp_grid)

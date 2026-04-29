@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def perlin_noise_2d(shape: tuple[int, int], res: tuple[int, int]) -> np.ndarray:
     """Generate a 2D numpy array of perlin noise.
     Args:

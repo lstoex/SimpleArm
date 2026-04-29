@@ -16,6 +16,7 @@ sdf_grad_x, sdf_grad_y = sdf.gradient()
 robot = RobotInfo.from_linklengths([0.5, 0.5])
 
 
+# Taken from costs.py
 def chomp_obstacle_cost_and_grad(dist, eps=0.1):
     # CHOMP paper obstacle cost c(d)
     cost = np.where(
@@ -31,12 +32,18 @@ def chomp_obstacle_cost_and_grad(dist, eps=0.1):
     )
     return cost, dcost_ddist
 
-#Plot the cost function vs signed distance to see how it behaves. Note the nonzero cost for slightly positive distances, which creates a "buffer" around obstacles.
-px.line(x=np.arange(-0.5, 0.5, 0.01), y=chomp_obstacle_cost_and_grad(np.arange(-0.5, 0.5, 0.01), eps=0.1)[0], title="CHOMP Obstacle Cost vs Signed Distance", labels={"x": "Signed Distance", "y": "Cost"})
-#%%
+
+# Plot the cost function vs signed distance to see how it behaves. Note the nonzero cost for slightly positive distances, which creates a "buffer" around obstacles.
+px.line(
+    x=np.arange(-0.5, 0.5, 0.01),
+    y=chomp_obstacle_cost_and_grad(np.arange(-0.5, 0.5, 0.01), eps=0.1)[0],
+    title="CHOMP Obstacle Cost vs Signed Distance",
+    labels={"x": "Signed Distance", "y": "Cost"},
+)
+# %%
 
 
-q_t = np.array([np.pi, np.pi/2])
+q_t = np.array([np.pi, np.pi / 2])
 
 q_history = [q_t]
 q_i = deepcopy(q_t)

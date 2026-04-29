@@ -31,23 +31,28 @@ class SquareGrid:
         data = np.stack(data, axis=0)  # (layers, nx, ny)
         data = np.sum(data, axis=0)  # (nx, ny)
 
-        data = ~np.logical_or(data < -0.5, data < 0.5) #TODO: make the threshold a parameter
+        data = ~np.logical_or(
+            data < -0.5, data < 0.5
+        )  # TODO: make the threshold a parameter
         return cls.from_zero_centered(limits=(-length / 2, length / 2), data=data)
-    
+
     def derive_sdf_from_voxels(self) -> "SquareGrid":
         """Derive a signed distance field from the grid data, treating nonzero values as obstacles."""
         sdf_data = voxel2sdf(voxels=self.data.astype(bool), voxel_size=self.voxel_size)
-        return SquareGrid(data=sdf_data, length=self.length, origin=self.origin) 
+        return SquareGrid(data=sdf_data, length=self.length, origin=self.origin)
 
     def gradient(self) -> tuple["SquareGrid", "SquareGrid"]:
         """Compute the gradient of the grid data and return it as a 2 new SquareGrids, one for each component of the gradient."""
         g_x, g_y = np.gradient(self.data, self.voxel_size)
         g = np.stack([g_x, g_y], axis=-1)  # (nx, ny, 2)
-        #normalize the gradient to have unit length, and set zero gradients to zero to avoid NaNs
+        # normalize the gradient to have unit length, and set zero gradients to zero to avoid NaNs
         g_norm = np.linalg.norm(g, axis=-1, keepdims=True)
         g_norm[g_norm == 0] = 1.0
         g = g / g_norm
-        return (SquareGrid(data=g[..., 0], length=self.length, origin=self.origin), SquareGrid(data=g[..., 1], length=self.length, origin=self.origin))
+        return (
+            SquareGrid(data=g[..., 0], length=self.length, origin=self.origin),
+            SquareGrid(data=g[..., 1], length=self.length, origin=self.origin),
+        )
 
     @classmethod
     def from_zero_centered(
@@ -84,7 +89,7 @@ class SquareGrid:
                 ],
             ]
         )
-    
+
     @property
     def limits(self) -> np.ndarray:
         """Real physical limits of the grid in world coordinates."""
@@ -129,7 +134,8 @@ class SquareGrid:
         dists = map_coordinates(
             input=self.data, coordinates=grid_idx.T, order=order, mode="nearest"
         )  # type: ignore
-        return dists.reshape(p.shape[:-1])  # reshape to original batch shape   
+        return dists.reshape(p.shape[:-1])  # reshape to original batch shape
+
 
 @dataclass
 class Spheres:
@@ -222,6 +228,7 @@ def get_min_signed_distance(p: np.ndarray, obstacles: Obstacles) -> np.ndarray:
     signed = center_dist - obstacles.r  # (..., M)
     return np.min(signed, axis=-1)
 
+
 def index_with_interpolation(
     p: np.ndarray,
     arr: np.ndarray,
@@ -250,9 +257,8 @@ def coords_to_indices(
     """Convert continuous coordinates (between outer edges of the grid) to grid coordinates (between -0.5 and (N-1)+0.5)."""
     return (coords - limits[0, :]) * (np.asarray(shape)) / (lengths) + -0.5
 
-def voxel2sdf(
-    voxels, voxel_size: float, add_boundary=True
-) -> np.ndarray:
+
+def voxel2sdf(voxels, voxel_size: float, add_boundary=True) -> np.ndarray:
     """
     Calculate the signed distance field from an 2D/3D image of the world.
     Obstacles are 1/True, free space is 0/False.
