@@ -123,9 +123,9 @@ class SquareGrid:
         """
         # ensure that positions is converted to a [batch, 2] array, even when a single point is given
         # or multiple batch dimensions are given. This allows for fast lookups. Batch dimensions are preserved in the output.
-        p = np.atleast_2d(p).reshape(-1, 2)
+        p_ = np.atleast_2d(p).reshape(-1, 2)
         # world -> voxel -> grid, or voxel -> grid
-        p_grid = self.T_g_w.apply(p) if p_isin_world else self.T_g_v.apply(p)
+        p_grid = self.T_g_w.apply(p_) if p_isin_world else self.T_g_v.apply(p_)
         grid_idx = coords_to_indices(
             coords=p_grid,
             limits=self.gridlimits,

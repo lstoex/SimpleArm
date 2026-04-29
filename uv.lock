@@ -1455,6 +1455,17 @@ wheels = [
 ]
 
 [[package]]
+name = "ompl"
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/69/a9/0e60f0405b4b1395b947fa21bcd3458814317975fda4b3293581e5f4e5e0/ompl-2.0.0-cp313-cp313-macosx_15_0_arm64.whl", hash = "sha256:ea0a705a674b7f18f0848bd84f9da496a545616397815ca4f991bf25beef90bf", size = 2278914, upload-time = "2026-04-07T01:33:07.319Z" },
+    { url = "https://files.pythonhosted.org/packages/11/d9/42e7d8d458729e7ecfa4eea476c13333c75804f5b41b4900b5cc2297b148/ompl-2.0.0-cp313-cp313-macosx_15_0_x86_64.whl", hash = "sha256:99a7e68790bdf589dbf4431a62996c0f40295e242a682e8cb169acb16fc4e647", size = 3026722, upload-time = "2026-04-07T01:33:08.667Z" },
+    { url = "https://files.pythonhosted.org/packages/69/0c/1e3cc86d1c13c40c748fccc58b3b323b134de1bac1b792c67380c52ec67d/ompl-2.0.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:db978d8aa6223253bb98b37e994cc7fbc8153954fea7340f253894d17b043946", size = 4359332, upload-time = "2026-04-07T01:33:10.081Z" },
+    { url = "https://files.pythonhosted.org/packages/96/9e/555580cf478880124160d6d0562945974d3aca485791ff4596ecb3b407dc/ompl-2.0.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1b59d2ac36dee0f00a17bcc592fe30425d1c6f56c5f60eee2d989f2287ea05b7", size = 4533303, upload-time = "2026-04-07T01:33:11.462Z" },
+]
+
+[[package]]
 name = "optype"
 version = "0.17.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2206,6 +2217,7 @@ source = { editable = "." }
 dependencies = [
     { name = "matplotlib" },
     { name = "numpy" },
+    { name = "ompl" },
     { name = "pandas" },
     { name = "plotly" },
     { name = "scipy" },
@@ -2228,6 +2240,7 @@ dev = [
 requires-dist = [
     { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "numpy", specifier = ">=2.4.1" },
+    { name = "ompl", specifier = ">=2.0.0" },
     { name = "pandas", specifier = ">=3.0.2" },
     { name = "plotly", specifier = ">=6.6.0" },
     { name = "scipy", specifier = ">=1.15.0" },
