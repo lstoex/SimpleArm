@@ -1,11 +1,12 @@
-from simplearm.robot import RobotInfo
-from simplearm.kinematics import forward_kinematic, world_spheres_from_frames
+import functools
+
 import numpy as np
 import plotly.graph_objects as go
-import functools
 from yaspin import yaspin
-from simplearm.geom import Obstacles
-from simplearm.geom import SquareGrid
+
+from simplearm.geom import Obstacles, SquareGrid
+from simplearm.kinematics import forward_kinematic, world_spheres_from_frames
+from simplearm.robot import RobotInfo
 
 
 class RobotViewer:

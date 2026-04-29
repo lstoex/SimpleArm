@@ -1,9 +1,10 @@
 # %%
-from simplearm.viz import RobotViewer
-from simplearm.robot import RobotInfo
 import numpy as np
 import scipy.interpolate as interp
+
 from simplearm.geom import Obstacles
+from simplearm.robot import RobotInfo
+from simplearm.viz import RobotViewer
 
 linklengths = [0.5, 0.5, 0.25, 0.25]
 robot = RobotInfo.from_linklengths(linklengths)

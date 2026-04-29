@@ -1,4 +1,5 @@
 import numpy as np
+
 from .geom import Obstacles, SquareGrid
 from .kinematics import forward_kinematic, world_spheres_from_frames
 

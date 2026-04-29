@@ -1,14 +1,15 @@
 # %%
-from simplearm.robot import RobotInfo
-from simplearm.kinematics import forward_kinematic, world_spheres_from_frames
+import numpy as np
+
+from simplearm.dynamics import mass_matrix_from_com_jacobians
+from simplearm.geom import Obstacles, get_min_signed_distance, pairwise_sphere_dist
 from simplearm.jacobians import (
+    com_jacobians_from_joint_jacobians,
     joint_jacobians,
     sphere_jacobians_from_joint_jacobians,
-    com_jacobians_from_joint_jacobians,
 )
-from simplearm.geom import pairwise_sphere_dist, Obstacles, get_min_signed_distance
-from simplearm.dynamics import mass_matrix_from_com_jacobians
-import numpy as np
+from simplearm.kinematics import forward_kinematic, world_spheres_from_frames
+from simplearm.robot import RobotInfo
 
 linklengths = [0.5, 0.5, 0.25, 0.25]  # this fully describes the shape of the robot.
 robot = RobotInfo.from_linklengths(

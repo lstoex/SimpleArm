@@ -1,11 +1,15 @@
 # %%
 from copy import deepcopy
-from simplearm.viz import RobotViewer
-from simplearm.robot import RobotInfo
+
 import numpy as np
+import pandas as pd
+import plotly.express as px
 import scipy.interpolate as interp
-from simplearm.geom import Obstacles
+from scipy import sparse
+
 from simplearm.costs import chomp_smoothness_cost_and_grad
+from simplearm.robot import RobotInfo
+from simplearm.viz import RobotViewer
 
 np.random.seed(42)
 linklengths = [0.5, 0.5]
@@ -21,11 +25,7 @@ t_traj = np.linspace(0, 1, 32)
 q_traj = cs(t_traj)
 RobotViewer(q_traj, robot).plot()
 # %%
-import plotly.express as px
-
 # plot joint values q_traj (32, 2) vs time t_traj (32,) to see how the trajectory looks in joint space
-import pandas as pd
-
 df = pd.DataFrame(q_traj, columns=[f"Joint {i}" for i in range(robot.n_dof)])
 px.line(df, title="Joint Trajectory")
 # %%
@@ -73,8 +73,6 @@ fig.show()
 # Again, the cost is a sum over squared terms.
 # %%
 # we can work out the math on paper and see that the jacbian is a bidiagonal matrix. Lets ignore dt for now to keep it simple.
-from scipy import sparse
-
 T = q_traj.shape[0] - 1  # now we dont refer to the frames but rather time...
 D = q_traj.shape[1]
 J = np.zeros((T, D, T - 1, D))

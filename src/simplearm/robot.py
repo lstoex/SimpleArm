@@ -1,9 +1,11 @@
 """Basic Robot Definition"""
 
-from simplearm.geom import Spheres
 from dataclasses import dataclass, field
+
 import numpy as np
 from numpy.typing import ArrayLike
+
+from simplearm.geom import Spheres
 from simplearm.utils import make_spheres
 
 

@@ -1,7 +1,11 @@
 # %%
-from simplearm.geom import SquareGrid
 import numpy as np
 import plotly.express as px
+import plotly.figure_factory as ff
+
+from simplearm.geom import SquareGrid
+from simplearm.robot import RobotInfo
+from simplearm.viz import RobotViewer
 
 # %%
 # Generate a random perlin noise grid and derive an sdf from it
@@ -20,7 +24,6 @@ fig.show()
 # %%
 # make a quiver plot of the sdf gradient to see how the collision repulsion field looks.
 sdf_grad_x, sdf_grad_y = sdf.gradient()
-import plotly.figure_factory as ff
 
 x0 = sdf_grad_x.limits[0][0]
 x1 = sdf_grad_x.limits[1][0]
@@ -76,9 +79,6 @@ px.imshow(
 
 # %%
 # Visualize a moving robot in a perlin noise world
-from simplearm.viz import RobotViewer
-from simplearm.robot import RobotInfo
-
 robot = RobotInfo.from_linklengths([0.5, 0.5])
 q = np.linspace(
     np.array([-np.pi / 2, -np.pi / 2]), np.array([np.pi, np.pi / 2]), num=64

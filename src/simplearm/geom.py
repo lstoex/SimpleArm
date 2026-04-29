@@ -1,9 +1,10 @@
 from dataclasses import dataclass
+
 import numpy as np
 from scipy.ndimage import map_coordinates
-from .perlin import perlin_noise_2d
-
 from viser.transforms import SE2
+
+from .perlin import perlin_noise_2d
 
 
 @dataclass

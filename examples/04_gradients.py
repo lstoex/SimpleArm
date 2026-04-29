@@ -1,13 +1,15 @@
 # %%
 # lets build the gradient that should push the robot out of collision.
-from simplearm.geom import SquareGrid
+from copy import deepcopy
+
 import numpy as np
 import plotly.express as px
+
 from simplearm import kinematics as kin
+from simplearm.geom import SquareGrid
 from simplearm.jacobians import joint_jacobians, sphere_jacobians_from_joint_jacobians
-from copy import deepcopy
-from simplearm.viz import RobotViewer
 from simplearm.robot import RobotInfo
+from simplearm.viz import RobotViewer
 
 np.random.seed(0)
 world = SquareGrid.from_random_perlin(length=3.0, number_of_vox=64, res=4, layers=2)
